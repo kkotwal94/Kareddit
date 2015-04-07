@@ -88,16 +88,51 @@ module.exports = function(app, passport) {
 
 //our route for returning a single post
 app.get('/posts/:post', function(request, response) {
-    response.json(request.post);
-});
+   //adding in our populate method, to load all comments associated with a post
+  request.post.populate('comments', function(error, post) {
+    if (error) { return next(error); }
 
+    response.json(request.post);
+  });
+});
+//a put request for our upvote function
 app.put('/posts/:post/upvote', function(req,res,next) {
     req.post.upvote(function(err,post) {
         if (err) { return next(err); }
         res.json(post);
     });
 });
- 
+//a post request for our comments
+app.post('/posts/:post/comments', function(req, res, next) {
+  var comment = new Comment(req.body);
+  comment.post = req.post;
+  //save to our database :) as a comment
+  comment.save(function(error, comment) {
+   if(error) { return next(error); }
+     req.post.comments.push(comment);
+     req.post.save(function(error, post) {
+         if(error) { return next(err); }
+         res.json(post);
+     });
+   });
+ });
+
+//our middleware, for faster loading?
+app.param('comment', function(req, res, next, id) {
+  var query = Comment.findById(id);
+  query.exec(function (error, comment) {
+    if(error) { return next(new Error('can\'t find post')); }
+    req.comment = comment;
+    return next();
+  });
+ });
+
+app.put('/posts/:post/comments/:comment/upvote', function(req,res,next) {
+   req.comment.upvote(function(error, comment) {
+        if (error) { return next(error); }
+        res.json(comment);
+  });
+});	
   
 //=================  
 

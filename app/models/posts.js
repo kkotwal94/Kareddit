@@ -13,4 +13,7 @@ this.upvotes += 1;
 this.save(cb);
 };
 
-mongoose.model('Post', PostSchema);
+var Post = mongoose.model('Post', PostSchema);
+
+module.exports = Post;
+
