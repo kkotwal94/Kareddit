@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+    <title>Kareddit Profile</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <style>
+        body        { padding-top:80px; word-wrap:break-word; 
+        background: url(http://creativepathsofthearts.com/wp-content/uploads/2014/04/colorful-backgrounds-hd-backgrounds.jpg) no-repeat center center fixed;
+                  -webkit-background-size: cover;
+                  -moz-background-size: cover;
+                   -o-background-size: cover;
+                   background-size: cover;
+                }
+            .container  {
+            background-color: transparent;
+             }
+
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+    </div>
+
+    <div class="row">
+
+        <!-- LOCAL INFORMATION -->
+        <div class="col-sm-6">
+            <div class="well">
+                <h3><span class="fa fa-user"></span> Local</h3>
+
+                    <p>
+                        <strong>id</strong>: <%= user._id %><br>
+                        <strong>email</strong>: <%= user.local.email %><br>
+                        <strong>password</strong>: <%= user.local.password %>
+                    </p>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
