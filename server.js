@@ -28,7 +28,9 @@ var Comment = mongoose.model('Comment');
 app.use(morgan('dev')); //log every request to teh console
 app.use(cookieParser()); //read our cookies for auth
 app.use(bodyParser()); //get information from html forms
-
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(__dirname + '/'));
 app.set('view engine', 'ejs'); //use ejs for templating
 
 //required for passport

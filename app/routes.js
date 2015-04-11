@@ -5,14 +5,19 @@ module.exports = function(app, passport) {
      var mongoose = require('mongoose');
      require('../app/models/comments.js');
      require('../app/models/posts.js');
+     require('../app/models/subreddit.js');
+     
      var Post = mongoose.model('Post');
      var Comment = mongoose.model('Comment');
+     var SubReddit = mongoose.model('SubReddit');
 
      app.get('/', function(req, res) {
          res.render('index.ejs'); //load the index.ejs file
          });
 
-
+     app.get('/subk', function(req, res) {
+         res.render('subreddit.ejs');
+         });
      //login form
      app.get('/login', function(req, res) {
          //render the page and pass in any flash data if it exists
@@ -22,7 +27,7 @@ module.exports = function(app, passport) {
     //process the login form 
     //app/post ('/login', do all our passport stuff here)
      app.post('/login', passport.authenticate('local-login', {
-         successRedirect : '/profile', //redirect to the secure profile section
+         successRedirect : '/k/55258cfde7edbed110c3dc11', //redirect to the secure profile section
          failureRedirect : '/login', //redirect back to the signup page
          failureFlash : true //allow flash messages
      }));
@@ -55,22 +60,56 @@ module.exports = function(app, passport) {
    });
 
 //==================
-
- app.get('/posts', function(req, res, next) {
-     Post.find(function(err, posts){
+ app.get('/k', function(req, res, next) {
+     SubReddit.find(function(err, subreddits) {
        if(err) { return next(err); }
-       res.json(posts);
+       res.json(subreddits);
        });
+     });
+
+ app.post('/k', function(req, res, next) {
+     var subreddit = new SubReddit(req.body);
+     subreddit.save(function(error, subreddit) {
+         if(error) { return next(error); }
+         res.json(subreddit);
+     });
    });
+ 
+//calling before the route, faster loading?
+   app.param('subreddit', function(req,res,next, id) {
+     var query = SubReddit.findById(id);
+
+     query.exec(function(error, subreddit){
+     if(error) { return next(error); }
+     if(!subreddit) { return next(new Error('Can\'t find /k')); }
+     req.subreddit = subreddit;
+     return next();
+   });
+  });
+
+app.get('/k/:subreddit', function(request, response) {
+   //adding in our populate method, to load all comments associated with a post
+  request.subreddit.populate('posts', function(error, subreddit) {
+    if (error) { return next(error); }
+
+    response.json(request.subreddit);
+  });
+});
 
 
 
-   app.post('/posts', function(req, res, next) {
+app.post('/k/:subreddit/posts', function(req, res, next) {
        var post = new Post(req.body);
+       post.subreddit = req.subreddit;
        post.save(function(error, post) {
            if(error) { return next(error); }
-           res.json(post);
+           req.subreddit.posts.push(post);
+           req.subreddit.save(function(error,subreddit) {
+             if(error) { return next(error); }
+             res.json(post);
        });
+});
+
 });
 
 
@@ -87,7 +126,8 @@ module.exports = function(app, passport) {
   });
 
 //our route for returning a single post
-app.get('/posts/:post', function(request, response) {
+
+app.get('/k/:subreddit/:post', function(request, response) {
    //adding in our populate method, to load all comments associated with a post
   request.post.populate('comments', function(error, post) {
     if (error) { return next(error); }
@@ -95,15 +135,15 @@ app.get('/posts/:post', function(request, response) {
     response.json(request.post);
   });
 });
-//a put request for our upvote function
-app.put('/posts/:post/upvote', function(req,res,next) {
+//put our upvote
+app.put('/k/:subreddit/:post/upvote', function(req,res,next) {
     req.post.upvote(function(err,post) {
         if (err) { return next(err); }
         res.json(post);
     });
 });
 //a post request for our comments
-app.post('/posts/:post/comments', function(req, res, next) {
+app.post('/k/:subreddit/:post/comments', function(req, res, next) {
   var comment = new Comment(req.body);
   comment.post = req.post;
   //save to our database :) as a comment
@@ -111,7 +151,7 @@ app.post('/posts/:post/comments', function(req, res, next) {
    if(error) { return next(error); }
      req.post.comments.push(comment);
      req.post.save(function(error, post) {
-         if(error) { return next(err); }
+         if(error) { return next(error); }
          res.json(post);
      });
    });
@@ -127,13 +167,20 @@ app.param('comment', function(req, res, next, id) {
   });
  });
 
-app.put('/posts/:post/comments/:comment/upvote', function(req,res,next) {
+app.put('/k/:subreddit/:post/comments/:comment/upvote', function(req,res,next) {
    req.comment.upvote(function(error, comment) {
         if (error) { return next(error); }
         res.json(comment);
   });
 });	
-  
+
+//grab a single post 
+app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
+     Comment.find(function(error, comments) {
+             if(error) { return next(error); }
+             res.json(comments);
+             });
+     });
 //=================  
 
 };
