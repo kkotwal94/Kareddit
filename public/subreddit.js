@@ -16,13 +16,14 @@ var Subreddit = React.createClass({
 
     getInitialState: function() {
        return {
-          subreddits : []
+          subreddits : [ 'main', 'funny']
        };
    },
 
      componentDidMount: function() {
        this.loadSubredditsFromServer();
        setInterval(this.loadSubredditsFromServer, this.props.pollInterval);
+       
      },
 
      render: function() {
@@ -48,5 +49,5 @@ var sList = React.createClass({
     }
    });
 
-React.render(<Subreddit url = {'localhost:8080/k/'} pollInterval={postFiller}/>,
+React.render(<Subreddit url = {'/k/'} pollInterval={postInterval}/>,
 document.getElementById('content'));
