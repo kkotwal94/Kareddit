@@ -15,8 +15,12 @@ module.exports = function(app, passport) {
          res.render('index.ejs'); //load the index.ejs file
          });
 
-     app.get('/subk', function(req, res) {
+     app.get('/r/', function(req, res) {
          res.render('subreddit.ejs');
+         });
+    
+     app.get('/r/main/', function(req, res) {
+         res.render('posts.ejs');
          });
      //login form
      app.get('/login', function(req, res) {
@@ -27,7 +31,7 @@ module.exports = function(app, passport) {
     //process the login form 
     //app/post ('/login', do all our passport stuff here)
      app.post('/login', passport.authenticate('local-login', {
-         successRedirect : '/k/55258cfde7edbed110c3dc11', //redirect to the secure profile section
+         successRedirect : '/subk', //redirect to the secure profile section
          failureRedirect : '/login', //redirect back to the signup page
          failureFlash : true //allow flash messages
      }));
