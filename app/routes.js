@@ -30,8 +30,10 @@ module.exports = function(app, passport) {
       });
      */
 
-      app.get('/r', function(req, res) {
-         res.render('subreddit.ejs');
+      app.get('/r',isLoggedIn, function(req, res) {
+         res.render('subreddit.ejs', { 
+         user : req.user
+         });
          });
      /* app.param('topic', function(req, res, next, name) {
          var Query = SubReddit.find({}, function(err, name) {
@@ -45,13 +47,17 @@ module.exports = function(app, passport) {
          return next();
          });
      })*/
-     app.get('/r/:topic', function(req, res) {
+     app.get('/r/:topic',isLoggedIn, function(req, res) {
             var topic = req.params.topic;
-            res.render('posts.ejs');
+            res.render('posts.ejs', {
+            user : req.user
+            });
             });
     
-    app.get('/r/main', function(req, res) {
-         res.render('posts.ejs');
+    app.get('/r/main',isLoggedIn, function(req, res) {
+         res.render('posts.ejs', {
+         user : req.user
+         });
          });
      
 
@@ -68,7 +74,7 @@ module.exports = function(app, passport) {
     //process the login form 
     //app/post ('/login', do all our passport stuff here)
      app.post('/login', passport.authenticate('local-login', {
-         successRedirect : '/subk', //redirect to the secure profile section
+         successRedirect : '/r', //redirect to the secure profile section
          failureRedirect : '/login', //redirect back to the signup page
          failureFlash : true //allow flash messages
      }));

@@ -39,13 +39,13 @@
                 <ul class="nav navbar-nav navbar-right">
                     
 
-                    <li><button onclick = "location.href= '/subk'" class="btn"  id="Subreddits" type="button">Browse Subreddits</button></li>
+                    <li><button onclick = "location.href= '/r'" class="btn"  id="Subreddits" type="button"><strong>Browse Subreddits</strong></button></li>
 
-                    <li><button  onclick = "location.href= '/login'"  class="btn" id="Login" type="button">Login</button></li>
+                    <li><button onclick = "location.href= '/profile'"  class="btn" id="Login" type="button"><strong>Upvotes:</strong> : <%= user.local.upvotes %></button></li>
 
-                    <li><button  onclick = "location.href= '/signup'"  class="btn" id="Register" type="button">Not a member.. register!</button></li>
+                    <li><button onclick = "location.href= '/profile'"  class="btn" id="Register" type="button"><strong>Posts</strong> : <%= user.local.posts %></button></li>
 
-                    <li><button onclick = "location.href= '/profile'" class="btn" id="Profile" type="button">Profile</button></li>
+                    <li><button onclick = "location.href= '/profile'" class="btn" id="Profile" type="button"><strong><%= user.local.email %></strong></button></li>
 
                   
 
