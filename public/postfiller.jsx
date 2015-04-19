@@ -1,3 +1,13 @@
+/*var mongoose = require('mongoose');
+     require('../app/models/comments.js');
+     require('../app/models/posts.js');
+     require('../app/models/subreddit.js');
+
+     var Post = mongoose.model('Post');
+     var Comment = mongoose.model('Comment');
+     var SubReddit = mongoose.model('SubReddit');
+*/
+//var mongoose = require('mongoose');
 var converter = new Showdown.converter();
 var postInterval = 4000;
 

@@ -13,7 +13,7 @@ var Subreddit = React.createClass({
                //console.log(data[0].__v);
                //console.log(data.length);
                this.setState({subreddits: data});
-               
+              
            }.bind(this),
            error: function(xhr, status, err) {
                   console.error(this.props.url, status, err.toString());

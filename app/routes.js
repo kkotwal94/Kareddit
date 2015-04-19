@@ -10,17 +10,54 @@ module.exports = function(app, passport) {
      var Post = mongoose.model('Post');
      var Comment = mongoose.model('Comment');
      var SubReddit = mongoose.model('SubReddit');
+ 
+      
+      /*var Query = SubReddit.find({}, function(err, names) {
+             if(err) throw err;
+             //list = [];
+             //for(var i = 0; i < names.length; i++) {
+             //console.log(names[i].name);
+           // }
+             //console.log(names);
+             return names;
+     });
+ 
+      console.log(Query);     
+     */
+    /* var x = SubReddit.find({"name" : "funny"}, function(err, sub) {
+             if (err) throw err;
+             console.log(sub);
+      });
+     */
+
+      app.get('/r', function(req, res) {
+         res.render('subreddit.ejs');
+         });
+     /* app.param('topic', function(req, res, next, name) {
+         var Query = SubReddit.find({}, function(err, name) {
+             if(err) throw err;
+             //console.log(names.name);
+            });
+         Query.exec(function(error, topic) {
+         if(error) { return next(error);}
+         if(!topic) { return next(new Error('Can\'t find /r/')); }
+         req.topic = topic;
+         return next();
+         });
+     })*/
+     app.get('/r/:topic', function(req, res) {
+            var topic = req.params.topic;
+            res.render('posts.ejs');
+            });
+    
+    app.get('/r/main', function(req, res) {
+         res.render('posts.ejs');
+         });
+     
+
 
      app.get('/', function(req, res) {
          res.render('index.ejs'); //load the index.ejs file
-         });
-
-     app.get('/r/', function(req, res) {
-         res.render('subreddit.ejs');
-         });
-    
-     app.get('/r/main/', function(req, res) {
-         res.render('posts.ejs');
          });
      //login form
      app.get('/login', function(req, res) {
@@ -80,13 +117,15 @@ module.exports = function(app, passport) {
    });
  
 //calling before the route, faster loading?
-   app.param('subreddit', function(req,res,next, id) {
-     var query = SubReddit.findById(id);
-
+   app.param('subreddit', function(req,res,next, name) {
+     
+     var query = SubReddit.findById( name);
+     //console.log(query)
      query.exec(function(error, subreddit){
      if(error) { return next(error); }
      if(!subreddit) { return next(new Error('Can\'t find /k')); }
      req.subreddit = subreddit;
+     console.log(subreddit);
      return next();
    });
   });
@@ -197,5 +236,6 @@ function isLoggedIn(req, res, next) {
    //if they arent redirect them to the home page
    res.redirect('/');
 }
+//================r/routes=====================//
 
 
