@@ -53,13 +53,18 @@ module.exports = function(app, passport) {
             user : req.user
             });
             });
-    
-    app.get('/r/main',isLoggedIn, function(req, res) {
+   
+    app.get('/r/:topic/:posts', isLoggedIn, function(req, res) {
+            res.render('comments.ejs', {
+            user: req.user
+            });
+            }); 
+   /* app.get('/r/main',isLoggedIn, function(req, res) {
          res.render('posts.ejs', {
          user : req.user
          });
          });
-     
+     */
 
 
      app.get('/', function(req, res) {
@@ -131,7 +136,7 @@ module.exports = function(app, passport) {
      if(error) { return next(error); }
      if(!subreddit) { return next(new Error('Can\'t find /k')); }
      req.subreddit = subreddit;
-     console.log(subreddit);
+    // console.log(subreddit);
      return next();
    });
   });
