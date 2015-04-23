@@ -112,13 +112,14 @@ module.exports = function(app, passport) {
    });
 
 //==================
+//get our subreddits
  app.get('/k', function(req, res, next) {
      SubReddit.find(function(err, subreddits) {
        if(err) { return next(err); }
        res.json(subreddits);
        });
      });
-
+//our subreddits, adding them via post method (test with curl -- data) and saveintodb
  app.post('/k', function(req, res, next) {
      var subreddit = new SubReddit(req.body);
      subreddit.save(function(error, subreddit) {
@@ -126,7 +127,126 @@ module.exports = function(app, passport) {
          res.json(subreddit);
      });
    });
- 
+//our link for grabbing our singular subreddit
+  app.param('subreddit', function(req,res,next, name) {
+     
+     var query = SubReddit.find({"name":name});
+     //console.log(query)
+     query.exec(function(error, subreddit){
+     if(error) { return next(error); }
+     if(!subreddit) { return next(new Error('Can\'t find /k')); }
+     req.subreddit = subreddit;
+     //console.log(subreddit);
+     return next();
+   });
+  });
+
+  //middleware
+//get our singular subreddit
+ app.get('/k/:subreddit', function(req, res) {
+     res.json(req.subreddit);
+ });
+//Our post method to making a new post (Test with curl --data) and save in our db
+ app.post('/k/:subreddit/posts', function(req, res, next) {
+  var post_s = new Post(req.body);
+  post_s.subreddit = req.subreddit;
+  
+  post_s.save(function(err, post_s){
+   if(err){ return next(err); }
+   //console.log(post_s.id);
+   req.subreddit[0].posts.push(post_s._id);
+   req.subreddit[0].save(function(err, subreddit) {
+       if(err){return next(err); }
+       
+       res.json(post_s);
+  });
+ });
+});
+//grabbing all the post of a singular sub reddit
+app.get('/k/:subreddit/posts', function(req, res, next) {
+     Post.find(function(err, post) {
+       if(err) { return next(err); }
+       res.json(post);
+       });
+     });
+
+//our parameter for grabbing singluar post
+ app.param('post', function(req,res,next, title) {
+
+     var query = Post.find({"title": title});
+     //console.log(query)
+     query.exec(function(error, post){
+     if(error) { return next(error); }
+     if(!post) { return next(new Error('Can\'t find /k')); }
+     req.post = post;
+     //console.log(subreddit);
+     return next();
+   });
+  });
+//grabbing our singular post
+app.get('/k/:subreddit/posts/:post', function(req, res) {
+     res.json(req.post);
+ });
+
+app.put('/k/:subreddit/posts/:post/upvote', function(req, res, next) {
+    console.log(req.post[0].upvotes);
+    req.post[0].upvote(function(err, post) {
+        if(err) { return next(err); }
+        res.json(post);
+    });
+}); 
+
+app.get('/k/:subreddit/posts/:post/comments', function(req, res, next) {
+     Comment.find(function(err, comments) {
+       if(err) { return next(err); }
+       res.json(comments);
+       });
+     });
+
+app.post('/k/:subreddit/posts/:post/comments', function(req, res, next) {
+  var comment_s = new Comment(req.body);
+  comment_s.post = req.post;
+  //console.log(comment_s);
+  comment_s.save(function(err, comment_s){
+   if(err){ return next(err); }
+  // console.log(req.post);
+   req.post[0].comments.push(comment_s._id);
+   req.post[0].save(function(err, post) {
+       if(err){return next(err); }
+
+       res.json(comment_s);
+  });
+ });
+});
+
+//our parameter for grabbing singluar post
+ app.param('comment', function(req,res,next, id) {
+
+     var query = Comment.findById(id);
+     //console.log(query)
+     query.exec(function(error, comment){
+     if(error) { return next(error); }
+     if(!comment) { return next(new Error('Can\'t find /k')); }
+     req.comment = comment;
+     //console.log(subreddit);
+     return next();
+   });
+  });
+
+ app.get('/k/:subreddit/posts/:post/comments/:comment', function(req, res) {
+     res.json(req.comment);
+ });
+
+ app.put('/k/:subreddit/posts/:post/comments/:comment/upvote', function(req, res, next) {
+    console.log(req.comment);
+    req.comment.upvote(function(err, comment) {
+        if(err) { return next(err); }
+        res.json(comment);
+    });
+});
+
+
+/* 
 //calling before the route, faster loading?
    app.param('subreddit', function(req,res,next, name) {
      
@@ -236,7 +356,7 @@ app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
              });
      });
 //=================  
-
+*/
 };
 //route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
