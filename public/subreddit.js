@@ -53,7 +53,7 @@ var List = React.createClass({ //has to be called list
      this.props.subreddits.map(function(subreddit) {
          return (
          
-         <li key = {subreddit.name}><a href = {/k/ +subreddit._id}>{subreddit.name}</a>
+         <li key = {subreddit.name}><a href = {/r/ +subreddit.name}>{subreddit.name}</a>
          <p>{subreddit.__v} posts</p>
          <hr/>
           </li>

@@ -8,6 +8,10 @@
      var SubReddit = mongoose.model('SubReddit');
 */
 //var mongoose = require('mongoose');
+
+var link = window.location.href;
+var array = link.split('/');
+var sub = array[array.length-1];
 var converter = new Showdown.converter();
 var postInterval = 4000;
 
@@ -19,8 +23,8 @@ var PostFiller = React.createClass({
             url: this.props.url,
             dataType: 'json',
             success: function(data) {
-              // console.log(data.posts);
-               this.setState({posts:data.posts});
+              console.log(data);
+               this.setState({posts:data});
             }.bind(this),
         error: function(xhr, status, err) {
                console.error(this.props.url,status, err.toString());
@@ -60,7 +64,7 @@ var List = React.createClass({ //has to be called list
      this.props.posts.map(function(post) {
          return (
 
-         <li key = {post.title}><a href = {post.link}>{post.title}</a>
+         <li key = {post.title}><a href = {'/r/' + sub +'/'+ post.title}>{post.title}</a>
          <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes}</p>
          <hr/>
           </li>
@@ -73,7 +77,7 @@ var List = React.createClass({ //has to be called list
     }
    });
 
-
-React.render(<PostFiller url = {'/k/55258cfde7edbed110c3dc11'} pollInterval={postInterval}/>,
+console.log(sub);
+React.render(<PostFiller url = {'/k/' + sub + '/posts'} pollInterval={postInterval}/>,
 document.getElementById('content'));
 

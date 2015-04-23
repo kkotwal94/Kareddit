@@ -2,6 +2,11 @@ var converter = new Showdown.converter();
 var postInterval = 4000;
 
 
+var link = window.location.href;
+var array = link.split('/');
+var sub = array[array.length-2];
+var topic = array[array.length-1];
+var ajax_link = '/k/' + sub + '/posts/' + topic + '/comments/';
 var CommentFiller = React.createClass({
   
     loadCommentsFromServer: function() {
@@ -9,10 +14,10 @@ var CommentFiller = React.createClass({
             url: this.props.url,
             dataType: 'json',
             success: function(data) {
-              // console.log(data.posts);
-               this.setState({comments:data.comments});
+               console.log(data);
+               this.setState({comments:data});
                this.setState({title:data})
-              // console.log(data.comments);
+               
             }.bind(this),
         error: function(xhr, status, err) {
                console.error(this.props.url,status, err.toString());
@@ -36,11 +41,11 @@ var CommentFiller = React.createClass({
    
 
     render: function() {
-            console.log(this.state.comments[0])
+            
             return(
                   
             <div className = "Comments">
-            <h1>{this.state.title.title} </h1>
+            
             <List comments = {this.state.comments}/>
             </div>
             )
@@ -76,5 +81,6 @@ var List = React.createClass({ //has to be called list
 
 
 //=============================================================
-React.render(<CommentFiller url = {'/k/55258cfde7edbed110c3dc11/5525bc26c4b4426b1f9f78ae'} pollInterval={postInterval}/>,
+//console.log(Jax);
+React.render(<CommentFiller url = {ajax_link} pollInterval={postInterval}/>,
 document.getElementById('content'));
