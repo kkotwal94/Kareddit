@@ -3,7 +3,6 @@ A Karan version of reddit
 
 #TODO:
 
-1. Use ajax calls to retrieve my subreddits (localhost:8080/k/) under category "name":
-2. Add rest of front end using reactJS and allow only 1 upvote on post/comment
-3. Make ajax calls cleaner and modular
+1. Add rest of front end using reactJS and allow only 1 upvote on post/comment
+2. Make ajax calls cleaner and modular
 
