@@ -6,7 +6,7 @@ var link = window.location.href;
 var array = link.split('/');
 var sub = array[array.length-2];
 var topic = array[array.length-1];
-var ajax_link = '/k/' + sub + '/posts/' + topic + '/comments/';
+var ajax_link = '/k/' + sub +'/'+  topic ;
 var CommentFiller = React.createClass({
   
     loadCommentsFromServer: function() {
@@ -15,7 +15,7 @@ var CommentFiller = React.createClass({
             dataType: 'json',
             success: function(data) {
                console.log(data);
-               this.setState({comments:data});
+               this.setState({comments:data.comments});
                this.setState({title:data})
                
             }.bind(this),
@@ -45,7 +45,10 @@ var CommentFiller = React.createClass({
             return(
                   
             <div className = "Comments">
-            
+            <div className = "Title">
+            <h1>{this.state.title.title}</h1>
+            </div>
+            <p> {this.state.title.author}</p>
             <List comments = {this.state.comments}/>
             </div>
             )

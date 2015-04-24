@@ -24,7 +24,7 @@ var PostFiller = React.createClass({
             dataType: 'json',
             success: function(data) {
               console.log(data);
-               this.setState({posts:data});
+               this.setState({posts:data.posts});
             }.bind(this),
         error: function(xhr, status, err) {
                console.error(this.props.url,status, err.toString());
@@ -64,7 +64,7 @@ var List = React.createClass({ //has to be called list
      this.props.posts.map(function(post) {
          return (
 
-         <li key = {post.title}><a href = {'/r/' + sub +'/'+ post.title}>{post.title}</a>
+         <li key = {post.title}><a href = {'/r/' + sub +'/'+ post._id}>{post.title}</a>
          <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes}</p>
          <hr/>
           </li>
@@ -78,6 +78,6 @@ var List = React.createClass({ //has to be called list
    });
 
 console.log(sub);
-React.render(<PostFiller url = {'/k/' + sub + '/posts'} pollInterval={postInterval}/>,
+React.render(<PostFiller url = {'/k/' + sub} pollInterval={postInterval}/>,
 document.getElementById('content'));
 

@@ -4,8 +4,8 @@ var PostSchema = new mongoose.Schema({
   title: String,
   link:  String,
   upvotes: {type: Number, default: 0},
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
-  subreddit: {type: String , ref: 'SubReddit'}
+  comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
+  subreddit: {type: mongoose.Schema.Types.ObjectId, ref: 'SubReddit'}
 });
 
 

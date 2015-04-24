@@ -112,6 +112,7 @@ module.exports = function(app, passport) {
    });
 
 //==================
+/*
 //get our subreddits
  app.get('/k', function(req, res, next) {
      SubReddit.find(function(err, subreddits) {
@@ -140,7 +141,7 @@ module.exports = function(app, passport) {
      return next();
    });
   });
-
+/*
   //middleware
 //get our singular subreddit
  app.get('/k/:subreddit', function(req, res) {
@@ -244,11 +245,27 @@ app.post('/k/:subreddit/posts/:post/comments', function(req, res, next) {
         res.json(comment);
     });
 });
+*/
+
+//get our subreddits
+ app.get('/k', function(req, res, next) {
+     SubReddit.find(function(err, subreddits) {
+       if(err) { return next(err); }
+       res.json(subreddits);
+       });
+     });
+//our subreddits, adding them via post method (test with curl -- data) and saveintodb
+ app.post('/k', function(req, res, next) {
+     var subreddit = new SubReddit(req.body);
+     subreddit.save(function(error, subreddit) {
+         if(error) { return next(error); }
+         res.json(subreddit);
+     });
+   });
 
 
-/* 
-//calling before the route, faster loading?
-   app.param('subreddit', function(req,res,next, name) {
+
+app.param('subreddit', function(req,res,next, name) {
      
      var query = SubReddit.findById( name);
      //console.log(query)
@@ -260,18 +277,13 @@ app.post('/k/:subreddit/posts/:post/comments', function(req, res, next) {
      return next();
    });
   });
-
 app.get('/k/:subreddit', function(request, response) {
    //adding in our populate method, to load all comments associated with a post
   request.subreddit.populate('posts', function(error, subreddit) {
     if (error) { return next(error); }
-
     response.json(request.subreddit);
   });
 });
-
-
-
 app.post('/k/:subreddit/posts', function(req, res, next) {
        var post = new Post(req.body);
        post.subreddit = req.subreddit;
@@ -283,8 +295,8 @@ app.post('/k/:subreddit/posts', function(req, res, next) {
              res.json(post);
        });
 });
-
 });
+
 
 
 //calling before the route, faster loading?
@@ -298,14 +310,11 @@ app.post('/k/:subreddit/posts', function(req, res, next) {
      return next();
    });
   });
-
 //our route for returning a single post
-
 app.get('/k/:subreddit/:post', function(request, response) {
    //adding in our populate method, to load all comments associated with a post
   request.post.populate('comments', function(error, post) {
     if (error) { return next(error); }
-
     response.json(request.post);
   });
 });
@@ -330,7 +339,6 @@ app.post('/k/:subreddit/:post/comments', function(req, res, next) {
      });
    });
  });
-
 //our middleware, for faster loading?
 app.param('comment', function(req, res, next, id) {
   var query = Comment.findById(id);
@@ -340,14 +348,12 @@ app.param('comment', function(req, res, next, id) {
     return next();
   });
  });
-
 app.put('/k/:subreddit/:post/comments/:comment/upvote', function(req,res,next) {
    req.comment.upvote(function(error, comment) {
         if (error) { return next(error); }
         res.json(comment);
   });
 });	
-
 //grab a single post 
 app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
      Comment.find(function(error, comments) {
@@ -355,8 +361,6 @@ app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
              res.json(comments);
              });
      });
-//=================  
-*/
 };
 //route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
