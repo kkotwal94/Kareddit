@@ -9,7 +9,7 @@ var userSchema = mongoose.Schema({
    local            : {
        email        : String,
        password     : String,
-       posts        : Number,
+       posts        : {type: Number, default: 0},
        upvotes      : {type: Number, default: 0}
    },
 
