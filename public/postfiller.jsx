@@ -52,6 +52,24 @@ var PostFiller = React.createClass({
       });
     });
    },
+
+   handlePostUpvote : function(postID) {
+      $.ajax({
+            url: this.props.url + '/' + postID + '/upvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              //console.log(data.name);
+               this.setState({title:data});
+               this.setState({posts:data.posts});
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+    },
+
+
     getInitialState: function() {
        return {
           posts: [],
@@ -96,7 +114,7 @@ var List = React.createClass({ //has to be called list
          return (
 
          <li key = {post._id}><a href = {'/r/' + sub +'/'+ post._id}>{post.title}</a>
-         <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author}</p>
+         <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author} <button>+</button> <button>-</button></p>
          <hr/>
           </li>
 
@@ -142,3 +160,6 @@ var PostForm = React.createClass({
 React.render(<PostFiller url = {'/k/' + sub} urls = {'/k/' + sub + '/posts/'} pollInterval={postInterval}/>,
 document.getElementById('content'));
 
+function myFunction() {
+ console.log("Hello");
+}

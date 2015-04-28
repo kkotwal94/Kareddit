@@ -292,6 +292,8 @@ app.post('/k/:subreddit/posts', function(req, res, next) {
            req.subreddit.posts.push(post);
            req.subreddit.save(function(error,subreddit) {
              if(error) { return next(error); }
+             req.user.local.posts = req.user.local.posts+1;
+             req.user.save();
              res.json(post);
        });
 });
@@ -335,6 +337,8 @@ app.post('/k/:subreddit/:post/comments', function(req, res, next) {
      req.post.comments.push(comment);
      req.post.save(function(error, post) {
          if(error) { return next(error); }
+         req.user.local.comments = req.user.local.comments + 1;
+         req.user.save();
          res.json(post);
      });
    });

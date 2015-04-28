@@ -10,6 +10,7 @@ var userSchema = mongoose.Schema({
        email        : String,
        password     : String,
        posts        : {type: Number, default: 0},
+       comments     : {type: Number, default: 0},
        upvotes      : {type: Number, default: 0}
    },
 
@@ -43,6 +44,7 @@ userSchema.methods.generateHash = function(password) {
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.local.password);
 };
+
 
 //make it modular and pass it to server.js
 module.exports = mongoose.model('User', userSchema);
