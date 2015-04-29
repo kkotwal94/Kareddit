@@ -11,7 +11,11 @@ var userSchema = mongoose.Schema({
        password     : String,
        posts        : {type: Number, default: 0},
        comments     : {type: Number, default: 0},
-       upvotes      : {type: Number, default: 0}
+       upvotes      : {type: Number, default: 0},
+       upvotedP     : [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
+       upvotedC     : [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
+       downvotedP   : [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
+       downvotedC   : [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
    },
 
    facebook         : {

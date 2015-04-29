@@ -1,5 +1,5 @@
 var converter = new Showdown.converter();
-var postInterval = 4000;
+var postInterval = 500;
 
 
 var link = window.location.href;
@@ -94,7 +94,44 @@ var List = React.createClass({ //has to be called list
 
          <li key = {comment._id}>
          <p>{comment.body}</p>
-         <p>Upvotes: {comment.upvotes} <strong>By: {comment.author}</strong></p>
+         <p>Upvotes: {comment.upvotes} <strong>By: {comment.author}</strong>
+<button onClick =
+{function(event){
+console.log(comment._id);
+ $.ajax({
+            url: ajax_link + '/comments/' + comment._id  + '/upvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              //console.log(data);
+              console.log("upvoted");
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+
+}
+}>+</button> <button onClick = 
+{function(event){
+console.log(comment._id);
+ $.ajax({
+            url: ajax_link + '/comments/' + comment._id + '/downvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              //console.log(data);
+              console.log("downvote");
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+
+}
+}
+>-</button>
+</p>
          <hr/>
           </li>
 

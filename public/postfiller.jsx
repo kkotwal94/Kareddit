@@ -13,8 +13,8 @@ var link = window.location.href;
 var array = link.split('/');
 var sub = array[array.length-1];
 var converter = new Showdown.converter();
-var postInterval = 4000;
-
+var postInterval = 1000;
+var id = '/k/' + sub;
 
 var PostFiller = React.createClass({
   
@@ -23,7 +23,7 @@ var PostFiller = React.createClass({
             url: this.props.url,
             dataType: 'json',
             success: function(data) {
-              //console.log(data.name);
+               //console.log(data);
                this.setState({title:data});
                this.setState({posts:data.posts});
             }.bind(this),
@@ -53,7 +53,7 @@ var PostFiller = React.createClass({
     });
    },
 
-   handlePostUpvote : function(postID) {
+   /*handlePostUpvote : function(postID) {
       $.ajax({
             url: this.props.url + '/' + postID + '/upvote',
             dataType: 'json',
@@ -67,7 +67,7 @@ var PostFiller = React.createClass({
                console.error(this.props.url,status, err.toString());
             }.bind(this)
         });
-    },
+    },*/
 
 
     getInitialState: function() {
@@ -106,7 +106,45 @@ var PostFiller = React.createClass({
 
 
 var List = React.createClass({ //has to be called list
+    handleUpvote : function(event) {
+     console.log("hello");
+     $.ajax({
+            url: this.props.url + '/' + e + '/upvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              console.log(data);
+              console.log("upvoted");
+              //this.setState({title:data});
+              //this.setState({posts:data.posts});
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+    },
+
+    handleDownvote : function(e) {
+     console.log("hello");
+     $.ajax({
+            url: this.props.url + '/' + postID + '/downvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              console.log(data);
+              console.log("downvoted");
+              //this.setState({title:data});
+              //this.setState({posts:data.posts});
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+    },
+
     render: function() {
+    var upvoted = "upvoted";
+    var downvoted = "downvoted";
     return(
     <ul>
     {
@@ -114,7 +152,42 @@ var List = React.createClass({ //has to be called list
          return (
 
          <li key = {post._id}><a href = {'/r/' + sub +'/'+ post._id}>{post.title}</a>
-         <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author} <button>+</button> <button>-</button></p>
+         <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author} <button onClick =
+{function(event){
+console.log(post._id);
+ $.ajax({
+            url: id + '/' + post._id + '/upvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              //console.log(data);
+              console.log("upvoted");
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+
+}
+}>+</button> <button onClick = 
+{function(event){
+console.log(post._id);
+ $.ajax({
+            url: id + '/' + post._id + '/downvote',
+            dataType: 'json',
+            type: 'PUT',
+            success: function(data) {
+              //console.log(data);
+              console.log("downvote");
+            }.bind(this),
+        error: function(xhr, status, err) {
+               console.error(this.props.url,status, err.toString());
+            }.bind(this)
+        });
+
+}
+}
+>-</button></p>
          <hr/>
           </li>
 
@@ -160,6 +233,4 @@ var PostForm = React.createClass({
 React.render(<PostFiller url = {'/k/' + sub} urls = {'/k/' + sub + '/posts/'} pollInterval={postInterval}/>,
 document.getElementById('content'));
 
-function myFunction() {
- console.log("Hello");
-}
+

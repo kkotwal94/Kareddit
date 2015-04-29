@@ -287,6 +287,7 @@ app.get('/k/:subreddit', function(request, response) {
 app.post('/k/:subreddit/posts', function(req, res, next) {
        var post = new Post(req.body);
        post.subreddit = req.subreddit;
+       post.date = Date.now();
        post.save(function(error, post) {
            if(error) { return next(error); }
            req.subreddit.posts.push(post);
@@ -324,13 +325,26 @@ app.get('/k/:subreddit/:post', function(request, response) {
 app.put('/k/:subreddit/:post/upvote', function(req,res,next) {
     req.post.upvote(function(err,post) {
         if (err) { return next(err); }
+        req.user.local.upvotes = req.user.local.upvotes + 1;
+        req.user.save();
         res.json(post);
     });
 });
+
+app.put('/k/:subreddit/:post/downvote', function(req,res,next) {
+    req.post.downvote(function(err,post) {
+        if (err) { return next(err); }
+        req.user.local.upvotes = req.user.local.upvotes - 1;
+        req.user.save();
+        res.json(post);
+    });
+});
+
 //a post request for our comments
 app.post('/k/:subreddit/:post/comments', function(req, res, next) {
   var comment = new Comment(req.body);
   comment.post = req.post;
+  comment.date = Date.now;
   //save to our database :) as a comment
   comment.save(function(error, comment) {
    if(error) { return next(error); }
@@ -355,9 +369,22 @@ app.param('comment', function(req, res, next, id) {
 app.put('/k/:subreddit/:post/comments/:comment/upvote', function(req,res,next) {
    req.comment.upvote(function(error, comment) {
         if (error) { return next(error); }
+        req.user.local.upvotes = req.user.local.upvotes + 1;
+        req.user.save();
         res.json(comment);
   });
-});	
+});
+
+
+app.put('/k/:subreddit/:post/comments/:comment/downvote', function(req,res,next) {
+   req.comment.downvote(function(error, comment) {
+        if (error) { return next(error); }
+        req.user.local.upvotes = req.user.local.upvotes - 1;
+        req.user.save();
+        res.json(comment);
+  });
+});
+	
 //grab a single post 
 app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
      Comment.find(function(error, comments) {
