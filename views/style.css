@@ -1,3 +1,14 @@
+
+
+button {
+
+background: #001A33;
+color:red; 
+border: none; 
+padding: 10px; 
+
+}
+
 * {
 font-family: 'Josefin Sans', sans-serif;
 }

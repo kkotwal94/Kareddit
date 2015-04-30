@@ -23,7 +23,17 @@ var PostFiller = React.createClass({
             url: this.props.url,
             dataType: 'json',
             success: function(data) {
-               //console.log(data);
+               for(var j = 0; j < data.posts.length; j++) { 
+                for( var i = 0; i < data.posts.length-1; i++) {
+                   if(data.posts[i].upvotes < data.posts[i+1].upvotes) {
+                   var temp = data.posts[i];
+                   data.posts[i] = data.posts[i+1];
+                   data.posts[i+1] = temp;
+                   }         
+               }
+             }
+   
+               // console.log(data.posts); 
                this.setState({title:data});
                this.setState({posts:data.posts});
             }.bind(this),
@@ -53,23 +63,6 @@ var PostFiller = React.createClass({
     });
    },
 
-   /*handlePostUpvote : function(postID) {
-      $.ajax({
-            url: this.props.url + '/' + postID + '/upvote',
-            dataType: 'json',
-            type: 'PUT',
-            success: function(data) {
-              //console.log(data.name);
-               this.setState({title:data});
-               this.setState({posts:data.posts});
-            }.bind(this),
-        error: function(xhr, status, err) {
-               console.error(this.props.url,status, err.toString());
-            }.bind(this)
-        });
-    },*/
-
-
     getInitialState: function() {
        return {
           posts: [],
@@ -77,12 +70,29 @@ var PostFiller = React.createClass({
        }
     },
 
-
     componentDidMount: function() {
+        //this.sortByUpvotes();
         this.loadPostsFromServer();
         setInterval(this.loadPostsFromServer, this.props.pollInterval);
+       // setInterval(this.sortByUpvotes, 1000);
     },
    
+
+   /*sortByUpvotes : function() {
+       for( var i = 0; i < this.state.posts.length-1; i++) {
+            if(this.state.posts[i].upvotes < this.state.posts[i+1].upvotes) {
+                
+                var temp = this.state.posts[i];
+                this.state.posts[i] = this.state.posts[i+1];
+                this.state.posts[i+1] = temp;
+          }
+      }
+               return(
+               console.log(this.state.posts),
+               this.setState(this.state.posts)
+              )
+    },*/
+
 
     render: function() {
             return(
@@ -150,9 +160,9 @@ var List = React.createClass({ //has to be called list
     {
      this.props.posts.map(function(post) {
          return (
-
-         <li key = {post._id}><a href = {'/r/' + sub +'/'+ post._id}>{post.title}</a>
-         <p><a href>{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author} <button onClick =
+         
+         <li key = {post._id}><a href = {post.link}>{post.title}</a>
+         <p><a href = {'/r/' + sub +'/'+ post._id} >{post.__v} comments</a> Upvotes : {post.upvotes} By: {post.author} Created on: {new Date(post.date).toUTCString()} <button onClick =
 {function(event){
 console.log(post._id);
  $.ajax({
@@ -203,15 +213,13 @@ console.log(post._id);
 var PostForm = React.createClass({
     handleSubmit : function(e) {
        e.preventDefault();
-       var author = React.findDOMNode(this.refs.author).value.trim();
        var title  = React.findDOMNode(this.refs.title).value.trim();
        var body   = React.findDOMNode(this.refs.body).value.trim();
        var link   = React.findDOMNode(this.refs.link).value.trim();
-       if(!title || !author || !link || !body) {
+       if(!title || !link || !body) {
           return;
        }
-       this.props.onPostSubmit({author: author, title:title, body:body, link:link});
-       React.findDOMNode(this.refs.author).value = '';
+       this.props.onPostSubmit({title:title, body:body, link:link});
        React.findDOMNode(this.refs.title).value = '';
        React.findDOMNode(this.refs.body).value = '';
        React.findDOMNode(this.refs.link).value = '';
@@ -219,10 +227,9 @@ var PostForm = React.createClass({
     render: function() {
        return (
          <form className="postForm" onSubmit={this.handleSubmit}>
-            <input type = "text" placeholder="Your name" ref="author" />
             <input type = "text" placeholder="Say Something for post body.." ref="body"/>
             <input type = "text" placeholder="Title..." ref="title"/>
-            <input type = "text" placeholder="Title link.." ref="link"/>
+            <input type = "text" placeholder="Title link..Include ...https://" ref="link"/>
             <input type = "submit" value="Post" />
          </form>
    );
@@ -233,4 +240,9 @@ var PostForm = React.createClass({
 React.render(<PostFiller url = {'/k/' + sub} urls = {'/k/' + sub + '/posts/'} pollInterval={postInterval}/>,
 document.getElementById('content'));
 
-
+function myFunction(post) {
+  var str;
+  for (var i = 0; i< post.length; i++) {
+       str += post[i];
+  }
+}

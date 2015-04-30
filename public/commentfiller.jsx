@@ -15,7 +15,16 @@ var CommentFiller = React.createClass({
             url: this.props.url,
             dataType: 'json',
             success: function(data) {
-              // console.log(data);
+                for(var j = 0; j < data.comments.length; j++) {
+                for( var i = 0; i < data.comments.length-1; i++) {
+                   if(data.comments[i].upvotes < data.comments[i+1].upvotes) {
+                   var temp = data.comments[i];
+                   data.comments[i] = data.comments[i+1];
+                   data.comments[i+1] = temp;
+                   }
+               }
+             }
+
                this.setState({comments:data.comments});
                this.setState({title:data})
                
@@ -94,8 +103,7 @@ var List = React.createClass({ //has to be called list
 
          <li key = {comment._id}>
          <p>{comment.body}</p>
-         <p>Upvotes: {comment.upvotes} <strong>By: {comment.author}</strong>
-<button onClick =
+         <p>Upvotes: {comment.upvotes} <strong>By: {comment.author}</strong> Created on: {new Date(comment.date).toDateString()} <button onClick =
 {function(event){
 console.log(comment._id);
  $.ajax({
@@ -147,20 +155,20 @@ console.log(comment._id);
 var CommentForm = React.createClass({
     handleSubmit : function(e) {
        e.preventDefault();
-       var author = React.findDOMNode(this.refs.author).value.trim();
+       //var author = React.findDOMNode(this.refs.author).value.trim();
        var body   = React.findDOMNode(this.refs.body).value.trim();
-       if(!author || !body) {
+       if(!body) {
           return;
        }
 
-       this.props.onCommentSubmit({author:author, body:body});
-       React.findDOMNode(this.refs.author).value = '';
+       this.props.onCommentSubmit({ body:body});
+       //React.findDOMNode(this.refs.author).value = '';
        React.findDOMNode(this.refs.body).value = '';
        },
      render: function() {
        return (
           <form className="commentForm" onSubmit={this.handleSubmit}>
-             <input type = "text" placeholder="Your name" ref="author"/>
+             
              <input type = "text" placeholder="Comment body.." ref="body"/>
              <input type = "submit" value="Comment" />
           </form>

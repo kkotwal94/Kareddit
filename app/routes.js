@@ -31,10 +31,12 @@ module.exports = function(app, passport) {
      */
 
       app.get('/r',isLoggedIn, function(req, res) {
+        
          res.render('subreddit.ejs', { 
          user : req.user
          });
-         });
+         
+        });
      /* app.param('topic', function(req, res, next, name) {
          var Query = SubReddit.find({}, function(err, name) {
              if(err) throw err;
@@ -58,16 +60,23 @@ module.exports = function(app, passport) {
             res.render('comments.ejs', {
             user: req.user
             });
-            }); 
-   /* app.get('/r/main',isLoggedIn, function(req, res) {
-         res.render('posts.ejs', {
-         user : req.user
+            });
+    /* 
+    app.get('/r', function(req, res) {
+         res.render('usubreddit.ejs', {
          });
          });
-     */
+    app.get('/r/:topic', function(req, res) {
+         res.render('uposts.ejs', {
+         });
+         });
 
-
-     app.get('/', function(req, res) {
+    app.get('/r/:topic/:posts', function(req, res) {
+         res.render('uposts.ejs', {
+         });
+         });
+    */
+   app.get('/', function(req, res) {
          res.render('index.ejs'); //load the index.ejs file
          });
      //login form
@@ -284,10 +293,11 @@ app.get('/k/:subreddit', function(request, response) {
     response.json(request.subreddit);
   });
 });
-app.post('/k/:subreddit/posts', function(req, res, next) {
+app.post('/k/:subreddit/posts',isLoggedIn, function(req, res, next) {
        var post = new Post(req.body);
        post.subreddit = req.subreddit;
-       post.date = Date.now();
+       post.author = req.user.local.email;
+       post.date = Date.now().toString();
        post.save(function(error, post) {
            if(error) { return next(error); }
            req.subreddit.posts.push(post);
@@ -322,29 +332,51 @@ app.get('/k/:subreddit/:post', function(request, response) {
   });
 });
 //put our upvote
-app.put('/k/:subreddit/:post/upvote', function(req,res,next) {
+app.put('/k/:subreddit/:post/upvote',isLoggedIn, function(req,res,next) {
+    if (contains(req.user.local.upvotedP, req.post._id)) {
+         req.post.downvote(function(err, post) {
+             req.user.local.upvotes = req.user.local.upvotes - 1;
+             req.user.save();
+             res.json(post);
+        });
+    }
+    else { 
     req.post.upvote(function(err,post) {
         if (err) { return next(err); }
         req.user.local.upvotes = req.user.local.upvotes + 1;
+        req.user.local.upvotedP.push(req.post._id);
         req.user.save();
         res.json(post);
     });
+   }
 });
 
-app.put('/k/:subreddit/:post/downvote', function(req,res,next) {
+app.put('/k/:subreddit/:post/downvote', isLoggedIn ,function(req,res,next) {
+    if (contains(req.user.local.downvotedP, req.post._id)) {
+         req.post.upvote(function(err, post) {
+             req.user.local.upvotes = req.user.local.upvotes + 1;
+             req.user.save();
+             res.json(post);
+        });
+    }
+    else {
     req.post.downvote(function(err,post) {
         if (err) { return next(err); }
         req.user.local.upvotes = req.user.local.upvotes - 1;
+        req.user.local.downvotedP.push(req.post._id);
         req.user.save();
         res.json(post);
     });
+   }
 });
 
+
 //a post request for our comments
-app.post('/k/:subreddit/:post/comments', function(req, res, next) {
+app.post('/k/:subreddit/:post/comments',isLoggedIn, function(req, res, next) {
   var comment = new Comment(req.body);
   comment.post = req.post;
-  comment.date = Date.now;
+  comment.date = Date.now().toString();
+  comment.author = req.user.local.email;
   //save to our database :) as a comment
   comment.save(function(error, comment) {
    if(error) { return next(error); }
@@ -366,24 +398,46 @@ app.param('comment', function(req, res, next, id) {
     return next();
   });
  });
-app.put('/k/:subreddit/:post/comments/:comment/upvote', function(req,res,next) {
-   req.comment.upvote(function(error, comment) {
-        if (error) { return next(error); }
+app.put('/k/:subreddit/:post/comments/:comment/upvote',isLoggedIn, function(req,res,next) {
+   if (contains(req.user.local.upvotedC, req.comment._id)) {
+         req.comment.downvote(function(err, comment) {
+             req.user.local.upvotes = req.user.local.upvotes - 1;
+             req.user.save();
+             res.json(comment);
+        });
+    }
+    else {
+    req.comment.upvote(function(err,comment) {
+        if (err) { return next(err); }
         req.user.local.upvotes = req.user.local.upvotes + 1;
+        req.user.local.upvotedC.push(req.comment._id);
         req.user.save();
         res.json(comment);
-  });
+    });
+   }
 });
 
 
-app.put('/k/:subreddit/:post/comments/:comment/downvote', function(req,res,next) {
-   req.comment.downvote(function(error, comment) {
-        if (error) { return next(error); }
+
+app.put('/k/:subreddit/:post/comments/:comment/downvote', isLoggedIn, function(req,res,next) {
+   if (contains(req.user.local.downvotedC, req.comment._id)) {
+         req.comment.upvote(function(err, comment) {
+             req.user.local.upvotes = req.user.local.upvotes + 1;
+             req.user.save();
+             res.json(comment);
+        });
+    }
+    else {
+    req.comment.downvote(function(err,comment) {
+        if (err) { return next(err); }
         req.user.local.upvotes = req.user.local.upvotes - 1;
+        req.user.local.downvotedC.push(req.comment._id);
         req.user.save();
         res.json(comment);
-  });
+    });
+   }
 });
+
 	
 //grab a single post 
 app.get('/k/:subreddit/:post/comments/:comment', function(req, res, next) {
@@ -403,5 +457,14 @@ function isLoggedIn(req, res, next) {
    res.redirect('/');
 }
 //================r/routes=====================//
-
+function contains(arr, id) {
+    for (var i = 0; i< arr.length; i++) {
+        if( arr[i] === id.toString()) {
+           console.log(arr[i]);
+           arr.splice(i, 1);
+           return true;
+           }
+        }
+    return false;
+}
 
